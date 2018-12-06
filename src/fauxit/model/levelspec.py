@@ -1,8 +1,13 @@
 import re
 from os.path import (join, sep)
+from os import environ
+from fauxit.settings import *
+
+init_env()
 
 class LevelSpec(object):
     """fake levelspec"""
+
     def __init__(self, show, sequence=None, shot=None):
         self.show = show
         self.sequence = sequence
@@ -45,9 +50,13 @@ class LevelSpec(object):
         else:
             return (self.show,)
 
+    @staticmethod
+    def root():
+        return environ.get(DD_SHOWS_ROOT)
+
     def path(self, relpath=None):
         """Return the full path given a levelspec"""
-        path = ("dd","shows") + self._as_tuple()
+        path = tuple(self.root().split("/")) + self._as_tuple()
         if relpath:
             path = path + tuple(relpath.split(sep))
         return "{}{}".format(sep,join(*path))
