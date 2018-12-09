@@ -2,16 +2,22 @@ import re
 from os.path import (join, sep)
 from os import environ
 from fauxit.settings import *
+from fauxit.model.level import Level
+from fauxit.model.level_name_validator import LevelNameValidator
 
 init_env()
 
+def default_validator(name, *args, **kwargs):
+    return name
+
 class LevelSpec(object):
     """fake levelspec"""
+    validate = LevelNameValidator.validate
 
     def __init__(self, show, sequence=None, shot=None):
-        self.show = show
-        self.sequence = sequence
-        self.shot = shot
+        self.show = self.validate(show, Level.show)
+        self.sequence = self.validate(sequence, Level.sequence)
+        self.shot = self.validate(shot, Level.shot)
 
     def leaf(self):
         if self.shot:
@@ -20,6 +26,13 @@ class LevelSpec(object):
             return self.sequence
         else:
             return self.show
+
+    def parent(self):
+        if self.shot:
+            return self.sequence
+        if self.sequence:
+            return self.show
+        return None
 
     @classmethod
     def from_str(cls, levelspec):
