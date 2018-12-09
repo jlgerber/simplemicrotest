@@ -1,4 +1,6 @@
 from fauxit.model.levelspec import LevelSpec
+from fauxit.model.level_name_validator import LevelNameValidator
+
 
 class FauxLevel(object):
     """
@@ -18,6 +20,10 @@ class FauxLevel(object):
         if not self.has_child(name):
             self.children[_name] = self.__class__.child_cls(_name)
         return self.children[_name]
+
+    def remove_child(self, name):
+        _name = str(name)
+        return self.children.pop(_name, None)
 
     def child(self, name):
         _name = str(name)
@@ -50,6 +56,9 @@ class Sequence(FauxLevel):
     def add_shot(self,name):
         return self.add_child(name)
 
+    def remove_shot(self, name):
+        return self.remove_child(name)
+
     def shot(self,name):
         return self.children[name]
 
@@ -72,6 +81,9 @@ class Project(FauxLevel):
         self.assets[name] = Asset(name)
         return self.assets[name]
 
+    def remove_asset(self, name):
+        return self.assets.pop(name, None)
+
     def asset(self,name):
         return self.assets[name]
 
@@ -80,6 +92,9 @@ class Project(FauxLevel):
 
     def add_sequence(self,name):
         return self.add_child(name)
+
+    def remove_sequence(self, name):
+        return self.remove_child(name)
 
     def sequence(self,name):
         return self.children[name]
@@ -104,6 +119,9 @@ class SGDB(FauxLevel):
 
     def add_project(self, name):
         return self.add_child(name)
+
+    def remove_project(self, name):
+        return self.remove_child(name)
 
     def project(self, name):
         return self.children[name]
@@ -134,6 +152,14 @@ class SGDB(FauxLevel):
             print "create", level
             SGL = SGL.add_child(str(level))
         return SGL
+
+    def remove_level(self, level):
+        levelspec = LevelSpec.from_str(level)
+        parent = levelspec.parent()
+        if parent:
+            self.level(parent).remove_child(levelspec.leaf())
+        else:
+            self.remove_child(level)
 
     def level(self, levelspec):
         """given a levelspec str, return an instance of Project, Sequence, or Shot"""
