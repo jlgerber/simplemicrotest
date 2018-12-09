@@ -30,5 +30,5 @@ class GatewayService(object):
         projects = self.gw.shotgun_rpc.projects()
         return json.dumps({ 'projects': projects})
 
-    def create_asset_for_project(self, project, asset):
+    def add_asset(self, project, asset):
         self.gw.shotgun_rpc.add_asset(project, asset)
