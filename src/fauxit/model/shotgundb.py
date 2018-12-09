@@ -8,9 +8,10 @@ class FauxLevel(object):
     generic crud for children, iter, str,
     """
     child_cls = None
-    def __init__(self, name):
+    def __init__(self, name, parent=None):
         self.children = {}
         self.name = name
+        self.parent = parent
 
     def has_child(self, name):
         return self.children.has_key(str(name))
@@ -18,7 +19,7 @@ class FauxLevel(object):
     def add_child(self, name):
         _name = str(name)
         if not self.has_child(name):
-            self.children[_name] = self.__class__.child_cls(_name)
+            self.children[_name] = self.__class__.child_cls(_name, self)
         return self.children[_name]
 
     def remove_child(self, name):
@@ -36,19 +37,32 @@ class FauxLevel(object):
     def __str__(self):
         return self.name
 
+    @property
+    def fullname(self):
+        if self.parent is None:
+            return self.name
+        else:
+            return "{}.{}".format( self.parent.fullname , self.name)
 
 class Shot(object):
-    def __init__(self, name, *args, **kwargs):
+    def __init__(self, name, parent=None):
         self.name = name
+        self.parent = parent
 
     def __str__(self):
         return self.name
 
+    @property
+    def fullname(self):
+        if self.parent is None:
+            return self.name
+        else:
+            return "{}.{}".format( self.parent.fullname , self.name)
 
 class Sequence(FauxLevel):
     child_cls = Shot
-    def __init__(self, name):
-        super(Sequence,self).__init__(name)
+    def __init__(self, name, parent=None):
+        super(Sequence,self).__init__(name,parent)
 
     def has_shot(self, name):
         return self.has_child(name)
@@ -70,8 +84,8 @@ class Sequence(FauxLevel):
 class Project(FauxLevel):
     child_cls = Sequence
 
-    def __init__(self, name):
-        super(Project,self).__init__(name)
+    def __init__(self, name, parent=None):
+        super(Project,self).__init__(name,parent)
         self.assets = {}
 
     def has_asset(self, name):
@@ -112,7 +126,7 @@ class Asset(object):
 class SGDB(FauxLevel):
     child_cls = Project
     def __init__(self):
-        super(SGDB,self).__init__("shotgun")
+        super(SGDB,self).__init__("shotgun", None)
 
     def has_project(self, name):
         return self.has_child(name)
@@ -150,7 +164,7 @@ class SGDB(FauxLevel):
         SGL = self
         for level in reversed([x for x in levelspec]):
             print "create", level
-            SGL = SGL.add_child(str(level))
+            SGL = SGL.add_child(str(level.leaf() ))
         return SGL
 
     def remove_level(self, level):
@@ -166,11 +180,11 @@ class SGDB(FauxLevel):
         levelspec = LevelSpec.from_str(levelspec)
         if levelspec.shot:
             return self.project(levelspec.show)\
-            .sequence("{}.{}".format(levelspec.show,levelspec.sequence))\
-            .shot("{}.{}.{}".format(levelspec.show,levelspec.sequence,levelspec.shot))
+            .sequence(levelspec.sequence)\
+            .shot(levelspec.shot)
         if levelspec.sequence:
             return self.project(levelspec.show)\
-            .sequence("{}.{}".format(levelspec.show,levelspec.sequence))
+            .sequence(levelspec.sequence)
         if levelspec.show:
             return self.project(levelspec.show)
         raise RuntimeError("unable to decode levelspec: {}".format(levelspec))
