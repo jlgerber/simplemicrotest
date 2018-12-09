@@ -43,26 +43,26 @@ class FauxLevelTest(unittest.TestCase):
     def test_child(self):
         fl = FauxLevelP("FOO")
         fl.add_child("BAR")
-        self.assertEquals(len(fl.children), 1)
+        self.assertEqual(len(fl.children), 1)
         child = fl.child("BAR")
-        self.assertEquals(child.name, "BAR")
-        self.assertEquals(len(fl.children), 1)
+        self.assertEqual(child.name, "BAR")
+        self.assertEqual(len(fl.children), 1)
 
 
 class ShotTest(unittest.TestCase):
     def test_init(self):
         shot = Shot("0001")
-        self.assertEquals(shot.name, "0001")
+        self.assertEqual(shot.name, "0001")
 
     def test_str(self):
         shot = Shot("0001")
-        self.assertEquals(str(shot), "0001")
+        self.assertEqual(str(shot), "0001")
 
 class SequenceTest(unittest.TestCase):
     def test_init(self):
         seq = Sequence("RD")
-        self.assertEquals(seq.name, "RD")
-        self.assertEquals(str(seq), "RD")
+        self.assertEqual(seq.name, "RD")
+        self.assertEqual(str(seq), "RD")
 
     def test_add_shot(self):
         seq = Sequence("RD")
@@ -79,7 +79,7 @@ class SequenceTest(unittest.TestCase):
         self.assertEqual(len(seq.children), 1)
         shot = seq.remove_shot("0001")
         self.assertEqual(len(seq.children),0)
-        self.assertEquals(shot.name, "0001")
+        self.assertEqual(shot.name, "0001")
 
 if __name__ == '__main__':
     unittest.main()
