@@ -2,9 +2,9 @@ import re
 from fauxit.model.level import Level
 
 class LevelNameValidator(object):
-    show_re = re.compile("^[A-Z]+[A-Z 0-9]*[A-Z]+$")
-    sequence_re = re.compile("^[A-Z]{2}[A-Z 0-9]*$")
-    shot_re = re.compile("^[0-9]+[A-Z 0-9]*$")
+    show_re = re.compile("^[A-Z]+[A-Z0-9]*[A-Z]+$")
+    sequence_re = re.compile("^[A-Z]{2}[A-Z0-9]*$")
+    shot_re = re.compile("^[0-9]+[A-Z0-9]*$")
 
     @classmethod
     def validate(cls, name, level):

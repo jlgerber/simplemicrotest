@@ -19,7 +19,26 @@ class LevelSpec(object):
         self.sequence = self.validate(sequence, Level.sequence)
         self.shot = self.validate(shot, Level.shot)
 
+    def __eq(self, other):
+        if self.shot == other.shot and \
+        self.sequence == other.sequence and \
+        self.show == other.show:
+            return True
+        return False
+
+    def __eq__(self, other):
+        if not isinstance(other,LevelSpec):
+            return False
+        return self.__eq(other)
+
+    def __ne__(self, other):
+        if not isinstance(other, LevelSpec):
+            return True
+        return not self.__eq(other)
+
     def leaf(self):
+        """Return the deepest level in a levelspec. (eg given FOO.RD.0001 return 0001)"""
+
         if self.shot:
             return self.shot
         elif self.sequence:
@@ -28,10 +47,13 @@ class LevelSpec(object):
             return self.show
 
     def parent(self):
+        """Return the parent levelspec of the current Level, or none if the levelspec
+        is a show"""
+
         if self.shot:
-            return self.sequence
+            return LevelSpec(self.show, self.sequence)
         if self.sequence:
-            return self.show
+            return LevelSpec(self.show)
         return None
 
     @classmethod
@@ -69,7 +91,9 @@ class LevelSpec(object):
 
     def path(self, relpath=None):
         """Return the full path given a levelspec"""
-        path = tuple(self.root().split("/")) + self._as_tuple()
+        path = tuple(\
+        filter( lambda x: x != "", self.root().split("/")) )\
+        + self._as_tuple()
         if relpath:
             path = path + tuple(relpath.split(sep))
         return "{}{}".format(sep,join(*path))

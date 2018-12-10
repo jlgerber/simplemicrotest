@@ -1,8 +1,7 @@
+import setup
+setup.setup()
+
 import unittest
-import os
-import sys
-pth = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(pth)
 from fauxit.model.shotgundb import FauxLevel, Shot, Sequence, Project, Asset, SGDB
 
 
@@ -54,6 +53,11 @@ class FauxLevelTest(unittest.TestCase):
         gchild = child.add_child("BLA")
         fullname = gchild.fullname
         self.assertEqual(fullname, "FOO.BAR.BLA")
+
+    def test_fullname_noparent(self):
+        fl = FauxLevelP("FOO")
+        fullname = fl.fullname
+        self.assertEqual(fullname, "FOO")
 
 class ShotTest(unittest.TestCase):
     def test_init(self):
