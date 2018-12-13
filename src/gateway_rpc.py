@@ -11,6 +11,7 @@ class GatewayRpcServiceHost(object):
 
     def __init__(self):
         print dir(GatewayRpcServiceHost.level_rpc)
+
     @rpc
     def create_level(self, levelspec):
         gateway = GatewayService(self)
