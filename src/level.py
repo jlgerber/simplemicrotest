@@ -6,11 +6,11 @@ from fauxit.model.levelspec import LevelSpec
 class LevelService(object):
     name = "level_service"
 
-
     def _path(self, level, relpath):
         levelspec = LevelSpec.from_str(level)
         path = levelspec.path(relpath)
         return path
+
     @rpc
     def path(self, level, relpath=None):
         return self._path(level, relpath)
@@ -34,7 +34,6 @@ class LevelService(object):
                 raise
         return newdir
 
-
     @rpc
     def mklevel(self, level, relpath=None, mode=0777):
         try:
@@ -47,7 +46,6 @@ class LevelService(object):
                 raise
         return newdir
 
-
     @rpc
     def rm(self, targetdir):
         try:
@@ -59,3 +57,15 @@ class LevelService(object):
         return targetdir
 
 
+    @rpc
+    def rmlevel(self, level, relpath=None, mode=0777):
+        try:
+            lsp = LevelSpec.from_str(level)
+            targetdir = lsp.path(relpath)
+            shutil.rmtree(targetdir)
+        except OSError as err:
+            if err.errno != errno.ENOENT:
+                raise
+            else:
+                return 0
+        return 1

@@ -10,7 +10,7 @@ init_env()
 def default_validator(name, *args, **kwargs):
     return name
 
-class LevelSpec(object):
+class LevelSpec(object): #(dict):
     """fake levelspec"""
     validate = LevelNameValidator.validate
 
@@ -18,6 +18,7 @@ class LevelSpec(object):
         self.show = self.validate(show, Level.show)
         self.sequence = self.validate(sequence, Level.sequence)
         self.shot = self.validate(shot, Level.shot)
+
 
     def __eq(self, other):
         if self.shot == other.shot and \
@@ -36,9 +37,15 @@ class LevelSpec(object):
             return True
         return not self.__eq(other)
 
+    def __add__(self, other):
+        if self.shot is not None:
+            raise RuntimeError("Cannot add a level to a full levelspec")
+        if isinstance(other, basestring):
+            return LevelSpec.from_str("{}.{}".format(str(self), other ))
+        raise TypeError("{} must be of type string".format(str(other)))
+
     def leaf(self):
         """Return the deepest level in a levelspec. (eg given FOO.RD.0001 return 0001)"""
-
         if self.shot:
             return self.shot
         elif self.sequence:
@@ -49,7 +56,6 @@ class LevelSpec(object):
     def parent(self):
         """Return the parent levelspec of the current Level, or none if the levelspec
         is a show"""
-
         if self.shot:
             return LevelSpec(self.show, self.sequence)
         if self.sequence:

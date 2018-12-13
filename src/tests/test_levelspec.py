@@ -97,5 +97,30 @@ class TestLevelSpec(unittest.TestCase):
         expect = "/TEST/FOO/BAR/0001/bla/bla/bla"
         self.assertEqual(ls.path("//bla////bla/bla"), expect)
 
+    def test_add(self):
+        ls = LevelSpec.from_str("FOO.BAR")
+        ls2 = ls + "0001"
+        self.assertEqual(ls2, LevelSpec.from_str("FOO.BAR.0001"))
+        self.assertEqual(ls2.__str__(), "FOO.BAR.0001")
+
+    def test_add_fail(self):
+        ls = LevelSpec("FOO", "BAR")
+        with self.assertRaises(TypeError):
+            lsn = ls + [1,2]
+
+    def test_add_full(self):
+        ls = LevelSpec("FOO", "BAR", "0001")
+        with self.assertRaises(RuntimeError):
+            lsn = ls + 1
+
+    def test_str(self):
+        ls = LevelSpec.from_str("FOO.BAR.0001")
+        string = ls.__str__()
+        self.assertEqual(string, "FOO.BAR.0001")
+
+    def test_str2(self):
+        ls = LevelSpec.from_str("FOO.BAR")
+        string = ls.__str__()
+        self.assertEqual(string, "FOO.BAR")
 if __name__ == '__main__':
     unittest.main()

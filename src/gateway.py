@@ -1,4 +1,6 @@
 import json
+import errno
+from fauxit.model.levelspec import LevelSpec
 
 class GatewayService(object):
     """Implement the business logic"""
@@ -8,6 +10,7 @@ class GatewayService(object):
     def build_level(self, levelspec):
         """construct level in shotgun and on disk"""
         try:
+            print "levelspec", levelspec
             # shotgun
             self.gw.shotgun_rpc.add_level(levelspec)
             # level
@@ -25,6 +28,22 @@ class GatewayService(object):
         shotgun_id = levelspec if has_level else "None"
         # return json
         return json.dumps({'path': path, 'shotgun_id': shotgun_id})
+
+    def get_children(self, levelspec):
+        # get the full path to the levelspec from level
+        sgchildren = self.gw.shotgun_rpc.child_levels(levelspec)
+        children = []
+        for child in sgchildren:
+            child_levelspec = LevelSpec.from_str(levelspec) + child
+            children.append(str(child_levelspec))
+        # return json
+
+        return json.dumps({'child_levels': children})
+
+    def delete_level(self, levelspec):
+        removed = self.gw.level_rpc.rmlevel(levelspec)
+        self.gw.shotgun_rpc.remove_level(levelspec)
+        return removed
 
     def get_projects(self):
         projects = self.gw.shotgun_rpc.projects()

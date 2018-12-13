@@ -3,7 +3,7 @@ setup.setup()
 
 import unittest
 from fauxit.model.shotgundb import FauxLevel, Shot, Sequence, Project, Asset, SGDB
-
+from fauxit.model.levelspec import LevelSpec
 
 class FauxLevelP(FauxLevel):
 
@@ -279,6 +279,9 @@ class TestSGDB(unittest.TestCase):
 
     def remove_level(self):
         """ """
+        self.db.add_level("FOO.RD")
+        level = self.db.remove_level("FOO.RD")
+        self.assertEqual(level, LevelSpec.from_Str("FOO.RD"))
     def test_level(self):
         """ """
     def test_child_levels(self):
