@@ -38,11 +38,6 @@ class ShotgunService(object):
     def assets(self, project):
         return self._assets(project)
 
-    # @http('GET', '/sgassets/<string:project>')
-    # def get_assets_http(self, request, project):
-    #     assets = self._assets(project)
-    #     return json.dumps({ 'assets': assets})
-
     def _projects(self):
         return self.sg.children.keys()
 

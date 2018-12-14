@@ -66,7 +66,8 @@ class LevelSpec(object): #(dict):
     def from_str(cls, levelspec):
         """Initialize a levelspec instance given a string of the
         form show[.seq[.shot]]"""
-
+        if not isinstance(levelspec, basestring):
+            raise TypeError("{} is not of type str".format(levelspec.__repr__()))
         if levelspec[0] == "." or levelspec[-1] == ".":
             raise ValueError("levelspec may not start with a '.': {}".format(levelspec))
 

@@ -10,7 +10,6 @@ class GatewayService(object):
     def build_level(self, levelspec):
         """construct level in shotgun and on disk"""
         try:
-            print "levelspec", levelspec
             # shotgun
             self.gw.shotgun_rpc.add_level(levelspec)
             # level

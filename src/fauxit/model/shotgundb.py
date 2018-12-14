@@ -30,6 +30,18 @@ class FauxLevel(object):
         _name = str(name)
         return self.children[_name]
 
+    def id(self):
+        """
+        return the shotgun id
+        """
+        return self._id("")
+
+    def _id(self, sofar):
+        if self.parent and self.parent.name != "shotgun":
+            sep = "" if sofar == "" else "."
+            return self.parent._id("{}{}{}".format(self.name, sep, sofar))
+        return "{}.{}".format(self.name, sofar)
+
     def __iter__(self):
         for child in self.children.itervalues():
             yield child
@@ -51,6 +63,12 @@ class Shot(object):
 
     def __str__(self):
         return self.name
+
+    def id(self):
+        return self._id("")
+
+    def _id(self, sofar):
+        return self.parent._id(self.name)
 
     @property
     def fullname(self):
@@ -170,14 +188,16 @@ class SGDB(FauxLevel):
     def remove_level(self, level):
         levelspec = LevelSpec.from_str(level)
         parent = levelspec.parent()
+        print parent, self.level(parent)
         if parent:
-            self.level(parent).remove_child(levelspec.leaf())
+            return self.level(parent).remove_child(levelspec.leaf())
         else:
-            self.remove_child(level)
+            return self.remove_child(level)
 
     def level(self, levelspec):
-        """given a levelspec str, return an instance of Project, Sequence, or Shot"""
-        levelspec = LevelSpec.from_str(levelspec)
+        """given a levelspec str or LevelSpec, return an instance of Project, Sequence, or Shot"""
+
+        levelspec = LevelSpec.from_str(levelspec) if isinstance(levelspec, basestring) else levelspec
         if levelspec.shot:
             return self.project(levelspec.show)\
             .sequence(levelspec.sequence)\

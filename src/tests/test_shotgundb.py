@@ -277,17 +277,28 @@ class TestSGDB(unittest.TestCase):
         self.assertEqual(seqs[0], "RD")
         self.assertTrue(proj.has_sequence("RD"))
 
-    def remove_level(self):
+    def test_remove_level(self):
         """ """
         self.db.add_level("FOO.RD")
         level = self.db.remove_level("FOO.RD")
-        self.assertEqual(level, LevelSpec.from_Str("FOO.RD"))
+        self.assertEqual(level.id(), "FOO.RD")
     def test_level(self):
         """ """
     def test_child_levels(self):
         """ """
     def test_projects(self):
         """ """
+
+    def test_id_shot(self):
+        level = self.db.add_level("FOO.BAR.0001")
+        level_id = level.id()
+        self.assertEqual(level_id, "FOO.BAR.0001")
+
+
+    def test_id_seq(self):
+        level = self.db.add_level("FOO.BAR")
+        level_id = level.id()
+        self.assertEqual(level_id, "FOO.BAR")
 
 if __name__ == '__main__':
     unittest.main()
